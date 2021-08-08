@@ -5,7 +5,7 @@ import os
 load_dotenv()
 
 
-DB_URI = "mongodb+srv://test:test@cluster0.nqwsp.mongodb.net/newdb"
+DB_URI = "mongodb+srv://test:test@cluster0.nqwsp.mongodb.net/newdb?authSource=admin&replicaSet=atlas-93t93s-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=true"
 connect(host=DB_URI)
 # print(DB_URI)
 try:
