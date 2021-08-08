@@ -4,5 +4,3 @@ load_dotenv()
 
 Email=os.getenv("Email")
 password=os.getenv("password")
-
-print(Email,":",password)
