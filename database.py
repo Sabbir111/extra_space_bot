@@ -5,9 +5,9 @@ import os
 load_dotenv()
 
 
-DB_URI = os.getenv("database_string")
+DB_URI = "mongodb+srv://test:test@cluster0.nqwsp.mongodb.net/newdb"
 connect(host=DB_URI)
-print(DB_URI)
+# print(DB_URI)
 try:
     class Records(Document):
         owner = ObjectIdField(required=True)
@@ -46,7 +46,7 @@ try:
                           )
 
         all_links.save()
-    # push_links("https://www.extraspace.com/storage/facilities/us/colorado/colorado_springs/1000000384/",
+    # push_links("https://www.extraspace.com/storage/facilities/us/colorado/colorado_spring/",
     #            "www.extraspace.com")
 
 except Exception as e:
