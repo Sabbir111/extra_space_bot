@@ -5,6 +5,7 @@ import threading
 
 
 def main():
+    print("starting")
     links = search_for_link()["data"]
     links_length = len(links)
     print(links_length)

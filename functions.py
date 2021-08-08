@@ -7,7 +7,7 @@ from database import *
 from os import path
 
 cwd = os.getcwd()
-# chrome_driver_file = (path.join(os.getcwd(), "storage", "chromedriver.exe"))
+chrome_driver_file = (path.join(os.getcwd(), "storage", "chromedriver.exe"))
 options = webdriver.ChromeOptions()
 prefs = {'profile.default_content_setting_values': {'images': 2,
                                                     'plugins': 2, 'popups': 2, 'geolocation': 2,
@@ -35,7 +35,7 @@ options.add_argument(('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) Ap
 
 def open_driver():
     try:
-        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=options)
+        driver = webdriver.Chrome(executable_path=chrome_driver_file, options=options)
         driver.maximize_window()
 
         return driver
