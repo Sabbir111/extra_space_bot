@@ -35,7 +35,7 @@ options.add_argument(('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) Ap
 
 def open_driver():
     try:
-        driver = webdriver.Chrome(executable_path=chrome_driver_file, options=options)
+        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=options)
         driver.maximize_window()
 
         return driver
