@@ -30,6 +30,7 @@ options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 options.add_argument("--headless")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--no-sandbox")
+options.add_argument('window-size=1920x1080')
 options.add_argument(('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'))
 
 
@@ -85,11 +86,9 @@ def multi_list(link_list_number):
 
 
 def check_items(driver, _id):
-
     try:
-
         item_size_path = """//div[@style="height: auto; overflow: visible;"]//div//div[@data-qa="unit-class-card"]/div/div/div[normalize-space(.) = "10' x 10'"]"""
-        item_size = WebDriverWait(driver, 5).until(
+        item_size = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, item_size_path))).text
         # print(item_size)
     except:
@@ -102,13 +101,13 @@ def check_items(driver, _id):
         try:
             # path = """//div[@style="height: auto; overflow: visible;"]//div//div[@data-qa="unit-class-card"]/div/div/div[normalize-space(.) = "10' x 10'"]//parent::div/following-sibling::div/ul/li/span[contains(text(),"Indoor")]"""
             indoor_access = item_size_path + '//parent::div/following-sibling::div/ul/li/span[contains(text(),"Indoor")]'
-            WebDriverWait(driver, 5).until(
+            WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, indoor_access)))
             result = "Indoor"
         except:
             try:
                 first_floor_access = item_size_path + '//parent::div/following-sibling::div/ul/li/span[contains(text(),"1st Floor Access")]'
-                WebDriverWait(driver, 5).until(
+                WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, first_floor_access)))
                 result ="1st Floor Access"
 
@@ -119,58 +118,93 @@ def check_items(driver, _id):
             # path="""//div[@style="height: auto; overflow: visible;"]//div//div[@data-qa="unit-class-card"]/div/div/div[normalize-space(.) = "5' x 10'"]//parent::div/following-sibling::div/ul/li/span[contains(text(),"Indoor")]//parent::li/preceding-sibling::li//child::span[contains(text(),"Climate Controlled")]"""
             check_climate = f"""({item_size_path}//parent::div/following-sibling::div/ul/li/span[contains(text(),"Indoor")])[1]//parent::li/preceding-sibling::li//child::span[contains(text(),"Climate Controlled")]"""
             try:
-                WebDriverWait(driver, 5).until(
+                WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, check_climate)))
 
                 climate_control = True
             except:
                 climate_control = False
+            try:
+                price_path = f"""({item_size_path}//parent::div/following-sibling::div/ul/li/span[contains(text(),"Indoor")])[1]//parent::li//parent::ul//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
+                item_price = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, price_path))).text
+            except:
+                driver.refresh()
+                try:
+                    price_path = f"""({item_size_path}//parent::div/following-sibling::div/ul/li/span[contains(text(),"Indoor")])[1]//parent::li//parent::ul//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
+                    item_price = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, price_path))).text
+                except:
+                    item_price="not found"
+            if item_price=="not found":
+                print("price not available")
+            else:
+                price = item_price.replace("$", "")
+                print("climate_control: ", climate_control)
+                print("price: ", price)
+                push_records(_id, item_size, climate_control, float(price))
 
-            price_path = f"""({item_size_path}//parent::div/following-sibling::div/ul/li/span[contains(text(),"Indoor")])[1]//parent::li//parent::ul//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
-            item_price = WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.XPATH, price_path))).text
-            price = item_price.replace("$", "")
-            print("climate_control: ", climate_control)
-            print("price: ", price)
-            push_records(_id, item_size, climate_control, float(price))
 
         elif result == "1st Floor Access":
             check_climate = f"""({item_size_path}//parent::div/following-sibling::div/ul/li/span[contains(text(),"1st Floor Access")])[1]//parent::li/preceding-sibling::li//child::span[contains(text(),"Climate Controlled")]"""
             try:
-                WebDriverWait(driver, 5).until(
+                WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, check_climate)))
-
                 climate_control = True
             except:
                 climate_control = False
-
-            price_path = f"""({item_size_path}//parent::div/following-sibling::div/ul/li/span[contains(text(),"1st Floor Access")])[1]//parent::li//parent::ul//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
-            item_price = WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.XPATH, price_path))).text
-            price = item_price.replace("$", "")
-            print("climate_control: ", climate_control)
-            print("price: ", price)
-            push_records(_id, item_size, climate_control, float(price))
+            try:
+                price_path = f"""({item_size_path}//parent::div/following-sibling::div/ul/li/span[contains(text(),"1st Floor Access")])[1]//parent::li//parent::ul//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
+                item_price = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, price_path))).text
+            except:
+                driver.refresh()
+                try:
+                    price_path = f"""({item_size_path}//parent::div/following-sibling::div/ul/li/span[contains(text(),"1st Floor Access")])[1]//parent::li//parent::ul//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
+                    item_price = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, price_path))).text
+                except:
+                    item_price="not found"
+            if item_price=="not found":
+                print("price not available")
+            else:
+                price = item_price.replace("$", "")
+                print("climate_control: ", climate_control)
+                print("price: ", price)
+                push_records(_id, item_size, climate_control, float(price))
 
         else:
             # path="""(//div[@style="height: auto; overflow: visible;"]//div//div[@data-qa="unit-class-card"]/div/div/div[normalize-space(.) = "10' x 10'"])[1]//parent::div/following-sibling::div/ul/li/span[contains(text(),"Climate Controlled")]"""
             check_climate = f"""({item_size_path})[1]//parent::div/following-sibling::div/ul/li/span[contains(text(),"Climate Controlled")]"""
             try:
-                WebDriverWait(driver, 5).until(
+                WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, check_climate)))
 
                 climate_control = True
             except:
                 climate_control = False
 
-            price_path = f"""({item_size_path})[1]//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
-            item_price = WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located((By.XPATH, price_path))).text
-            price = item_price.replace("$", "")
-            print("climate_control: ", climate_control)
-            print("price: ", price)
-            push_records(_id, item_size, climate_control, float(price))
 
+            try:
+                price_path = f"""({item_size_path})[1]//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
+                item_price = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, price_path))).text
+            except:
+                driver.refresh()
+                try:
+                    price_path = f"""({item_size_path})[1]//parent::div/following-sibling::div[@data-qa="web-rate"]/div[1]"""
+                    item_price = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, price_path))).text
+                except:
+                    item_price="not found"
+
+            if item_price == "not found":
+                print("price not available")
+            else:
+                price = item_price.replace("$", "")
+                print("climate_control: ", climate_control)
+                print("price: ", price)
+                push_records(_id, item_size, climate_control, float(price))
     else:
         pass
 
